@@ -2,8 +2,8 @@
 
 > Evaluación Parcial 3 | DSY1106 Desarrollo Fullstack III | DuocUC 2026
 
-**Integrantes:** Oscar Flores · Leroy Rodriguez
-**Profesor:** Juan Valentin Mora Ruiz
+**Autor:** Leroy Rodriguez
+**Profesor:** Cristián Garcia Gutiérrez
 
 ---
 
