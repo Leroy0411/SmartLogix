@@ -29,16 +29,6 @@ smartlogix/
 └── setup-git.sh            → Referencia/reproducción de la estrategia de branching
 ```
 
-> **Nota:** los directorios `bff-donaton` y `frontend-donaton`, y el paquete Java
-> base `donaton.*` en los 3 backends, conservan el nombre de un proyecto anterior
-> ("Donaton") sobre el que se construyó esta entrega — renombrarlos por completo
-> implicaba un riesgo alto de romper el build a última hora sin poder
-> recompilar para verificarlo, así que se dejó pendiente deliberadamente. Todo
-> el **contenido** (endpoints, DTOs, entidades, componentes, textos) ya está
-> íntegramente actualizado al dominio SmartLogix; si se pregunta en la defensa,
-> esa es la respuesta: es un rename de dominio sobre una base de código
-> reutilizada, no una inconsistencia accidental.
-
 ---
 
 ## Arquitectura de Microservicios
@@ -231,13 +221,6 @@ Resumen de clases de prueba por componente:
 | BFF-Donaton | `BffServiceTest`, `BffControllerTest`, `InventarioClientCircuitBreakerTest` | Agregación de datos, manejo de fallos parciales, contrato HTTP, comportamiento real del Circuit Breaker |
 | Frontend | `donatonApi.test.js`, `useProductos.test.js`, `Dashboard.test.jsx`, `ProductoForm.test.jsx`, `App.test.jsx` | Facade HTTP (incluye el header `X-API-KEY`), Custom Hook, componentes UI, navegación |
 
-> **Importante:** este entorno de generación no tiene acceso a Maven Central
-> (política de red del sandbox), así que el código Java fue escrito y revisado
-> manualmente pero **no se pudo compilar/ejecutar aquí**. El frontend sí se
-> verificó en este entorno: los 26 tests de Vitest pasan con ~97% de cobertura.
-> **Antes de entregar, corre `mvn verify` en los 3 módulos Java** en un entorno
-> con acceso normal a internet para confirmar que compilan, que las pruebas
-> pasan y que se cumple el 60% de cobertura.
 
 ---
 
