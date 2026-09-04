@@ -157,6 +157,16 @@ class InventarioServiceTest {
     }
 
     @Test
+    @DisplayName("ActualizarEstado con un estado no soportado debe lanzar IllegalArgumentException")
+    void actualizarEstado_estadoInvalido_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> inventarioService.actualizarEstado(1L, "EN_REPARACION"));
+
+        verify(productoRepository, never()).findById(any());
+        verify(productoRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("DescontarStock reduce el stock y marca AGOTADO al llegar a cero")
     void descontarStock_llegaACero_marcaAgotado() {
         Producto producto = new Producto(1L, "ELECTRONICA", "A", 5, 1L, "d");
@@ -183,6 +193,15 @@ class InventarioServiceTest {
         assertTrue(resultado.isPresent());
         assertEquals(6, resultado.get().getStock());
         assertEquals("DISPONIBLE", resultado.get().getEstado());
+    }
+
+    @Test
+    @DisplayName("DescontarStock con cantidad no positiva debe lanzar IllegalArgumentException")
+    void descontarStock_cantidadNoPositiva_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> inventarioService.descontarStock(1L, 0));
+
+        verify(productoRepository, never()).findById(any());
     }
 
     // ─── PRUEBAS DE ELIMINACIÓN ──────────────────────────────────────────

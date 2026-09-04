@@ -1,100 +1,33 @@
 ===========================================================
-  DONATON — PARCIAL 3 | DSY1106 Desarrollo Fullstack III
-  Repositorios GitHub
+  SMARTLOGIX — PARCIAL 3 | DSY1106 Desarrollo Fullstack III
+  Repositorio GitHub
 ===========================================================
 
-REPOSITORIO PRINCIPAL
+IMPORTANTE: reemplaza TU_USUARIO_GITHUB por tu usuario real antes de
+entregar. Este archivo antes describía un split en 5 repositorios de un
+proyecto anterior (Donaton) que ya no corresponde a esta entrega: SmartLogix
+se entrega como UN SOLO monorepo con todos los componentes.
+
+REPOSITORIO
 ─────────────────────
-URL: https://github.com/oscar-flores-leroy/donaton-parcial3
-Descripción: Repositorio raíz del proyecto. Contiene el README
-             general, diagrama de arquitectura y referencias a
-             todos los componentes.
+URL: https://github.com/TU_USUARIO_GITHUB/smartlogix
+Descripción: Monorepo con los 3 microservicios/BFF backend, el frontend
+             React y la documentación del Parcial 3.
 
-──────────────────────────────────────────────────────────
+Estructura:
+  smartlogix/
+  ├── ms-inventario/    → Gestión de Inventario (puerto 8081)
+  ├── ms-pedidos/       → Procesamiento de Pedidos + Coordinación de
+  │                        Envíos (puerto 8082)
+  ├── bff-donaton/      → Backend For Frontend (puerto 8080)
+  ├── frontend-donaton/ → Frontend React + Vite (puerto 5173)
+  ├── arquetipos-maven/ → Arquetipo Maven para nuevos microservicios
+  └── documentacion/    → PDFs de análisis de patrones y branching
 
-MICROSERVICIO MS-DONACIONES
-────────────────────────────
-URL: https://github.com/oscar-flores-leroy/ms-donaciones
-Puerto: 8081
-Patrones: Repository Pattern + Factory Method (GoF)
-Persistencia: Spring Data JPA + H2 (archivo) — ./data/donaciones-db
-Documentación API: Swagger UI en /swagger-ui.html
-Descripción: Gestión del ciclo de vida completo de donaciones
-             (ROPA, ALIMENTO, MEDICO, HIGIENE). Incluye pruebas
-             unitarias con JUnit 5 + Mockito (Service, Controller,
-             Factories, Repository JPA) y reporte JaCoCo.
-Ramas:
-  - main
-  - develop
-  - feature/ms-donaciones-repository
-  - feature/ms-donaciones-factory
-  - feature/ms-donaciones-jpa-persistence
-  - feature/ms-donaciones-tests
+Estrategia de branching: Git Flow (main / develop / feature/*), ver el
+diagrama y el detalle en el README raíz, sección "Estrategia de Branching".
+El historial real de commits y ramas puede inspeccionarse directamente con:
 
-──────────────────────────────────────────────────────────
-
-MICROSERVICIO MS-LOGÍSTICA
-──────────────────────────
-URL: https://github.com/oscar-flores-leroy/ms-logistica
-Puerto: 8082
-Patrones: Repository Pattern + Observer (GoF)
-Persistencia: Spring Data JPA + H2 (archivo) — ./data/logistica-db
-Documentación API: Swagger UI en /swagger-ui.html
-Descripción: Gestión de centros de acopio y envíos. Implementa
-             el patrón Observer para notificar cambios de estado
-             a auditoría y sistema de notificaciones.
-Ramas:
-  - main
-  - develop
-  - feature/ms-logistica-repository
-  - feature/ms-logistica-observer
-  - feature/ms-logistica-jpa-persistence
-  - feature/ms-logistica-tests
-
-──────────────────────────────────────────────────────────
-
-BACKEND FOR FRONTEND (BFF)
-──────────────────────────
-URL: https://github.com/oscar-flores-leroy/bff-donaton
-Puerto: 8080
-Patrón: Backend For Frontend (BFF)
-Documentación API: Swagger UI en /swagger-ui.html
-Descripción: Agrega datos de MS-Donaciones y MS-Logística en
-             un único response optimizado para el dashboard React.
-             Incluye manejo de fallos parciales con alertas.
-Ramas:
-  - main
-  - develop
-  - feature/bff-service
-  - feature/bff-swagger
-  - feature/bff-tests
-
-──────────────────────────────────────────────────────────
-
-FRONTEND REACT
-──────────────
-URL: https://github.com/oscar-flores-leroy/frontend-donaton
-Puerto: 5173 (Vite)
-Patrones: Facade (donatonApi.js) + Custom Hook (useDonaciones)
-Descripción: SPA React + Vite con Dashboard que consume el BFF
-             y formulario de registro de donaciones. Pruebas con
-             Vitest + React Testing Library (~97% cobertura).
-Ramas:
-  - main
-  - develop
-  - feature/frontend-donaton
-  - feature/frontend-tests
-
-──────────────────────────────────────────────────────────
-
-ARQUETIPOS MAVEN
-────────────────
-URL: https://github.com/oscar-flores-leroy/donaton-arquetipos
-Descripción: Arquetipo Maven para generar nuevos microservicios
-             Donaton con estructura base estandarizada (Repository
-             Pattern + Controller + pruebas unitarias).
-Ramas:
-  - main
-  - feature/arquetipos-maven
+  git log --oneline --graph --all
 
 ===========================================================

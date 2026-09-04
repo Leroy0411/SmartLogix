@@ -1,0 +1,67 @@
+# Levanta toda la plataforma SmartLogix con un solo comando, pensado para
+# la demo en vivo de 15 minutos (ver README, sección "Cómo levantar todo").
+#
+#   docker compose up --build
+#
+# Servicios y puertos:
+#   ms-inventario  -> 8081
+#   ms-pedidos     -> 8082
+#   bff-donaton    -> 8080
+#   frontend       -> 5173 (servido por nginx dentro del contenedor)
+#
+# La API_KEY es compartida por los 3 backends (ver README, sección Seguridad).
+# Cámbiala aquí (o exporta la variable de entorno API_KEY antes de levantar)
+# si no quieres usar el valor de desarrollo por defecto.
+
+services:
+  ms-inventario:
+    build: ./ms-inventario
+    ports:
+      - "8081:8081"
+    environment:
+      API_KEY: ${API_KEY:-smartlogix-dev-key}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:5173}
+    volumes:
+      - inventario-data:/app/data
+
+  ms-pedidos:
+    build: ./ms-pedidos
+    ports:
+      - "8082:8082"
+    environment:
+      API_KEY: ${API_KEY:-smartlogix-dev-key}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:5173}
+      MS_INVENTARIO_URL: http://ms-inventario:8081
+    volumes:
+      - pedidos-data:/app/data
+    depends_on:
+      - ms-inventario
+
+  bff-donaton:
+    build: ./bff-donaton
+    ports:
+      - "8080:8080"
+    environment:
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:5173}
+      MS_INVENTARIO_URL: http://ms-inventario:8081
+      MS_PEDIDOS_URL: http://ms-pedidos:8082
+    depends_on:
+      - ms-inventario
+      - ms-pedidos
+
+  frontend:
+    build:
+      context: ./frontend-donaton
+      args:
+        VITE_BFF_URL: http://localhost:8080
+        VITE_MS_INVENTARIO: http://localhost:8081
+        VITE_MS_PEDIDOS: http://localhost:8082
+        VITE_API_KEY: ${API_KEY:-smartlogix-dev-key}
+    ports:
+      - "5173:80"
+    depends_on:
+      - bff-donaton
+
+volumes:
+  inventario-data:
+  pedidos-data:

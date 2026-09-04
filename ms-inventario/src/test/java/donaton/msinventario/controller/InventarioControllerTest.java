@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -25,8 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Pruebas unitarias del InventarioController mediante @WebMvcTest.
  * Verifica el contrato HTTP (status codes, payloads) sin levantar
  * el contexto completo de Spring ni la base de datos.
+ *
+ * addFilters = false: estas pruebas se enfocan en el contrato
+ * controller/service, no en el ApiKeyFilter (que tiene su propia
+ * prueba unitaria dedicada en ApiKeyFilterTest).
  */
 @WebMvcTest(InventarioController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("InventarioController - Pruebas Unitarias")
 class InventarioControllerTest {
 
@@ -109,6 +115,22 @@ class InventarioControllerTest {
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/inventario sin categoría (Bean Validation) retorna 400 sin llegar al service")
+    void crearProducto_sinCategoria_retornaBadRequestPorValidacion() throws Exception {
+        Map<String, Object> body = Map.of(
+                "proveedor", "Santiago", "stock", 20, "bodegaId", 1
+        );
+
+        mockMvc.perform(post("/api/inventario")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalles.categoria").exists());
+
+        verify(inventarioService, never()).crearProducto(any(), any(), any(), any(), any());
     }
 
     @Test

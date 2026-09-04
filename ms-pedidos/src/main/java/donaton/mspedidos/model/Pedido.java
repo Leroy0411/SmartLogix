@@ -1,6 +1,9 @@
 package donaton.mspedidos.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -19,12 +22,14 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "El centro de distribución es obligatorio")
     @Column(name = "centro_distribucion_id", nullable = false)
     private Long centroDistribucionId;
 
     @Column(name = "cliente_id")
     private Long clienteId;
 
+    @NotBlank(message = "La dirección de entrega es obligatoria")
     @Column(name = "direccion_entrega", nullable = false)
     private String direccionEntrega;
 
@@ -33,6 +38,20 @@ public class Pedido {
 
     @Column(name = "patente_vehiculo")
     private String patenteVehiculo;
+
+    /**
+     * Producto de MS-Inventario asociado a este pedido, y la cantidad
+     * despachada. Es opcional (pedidos históricos o de solo-servicio pueden
+     * no estar ligados a un ítem de inventario), pero cuando está presente,
+     * al despachar el pedido MS-Pedidos descuenta este stock en
+     * MS-Inventario (ver PedidoService.despacharPedido / InventarioClient).
+     */
+    @Column(name = "producto_id")
+    private Long productoId;
+
+    @Min(value = 1, message = "La cantidad del producto debe ser mayor que cero")
+    @Column(name = "cantidad_producto")
+    private Integer cantidadProducto;
 
     @Column(nullable = false, length = 20)
     private String estado;              // PENDIENTE, EN_CAMINO, ENTREGADO, CANCELADO
@@ -92,6 +111,10 @@ public class Pedido {
     public void setResponsableTransporte(String responsableTransporte) { this.responsableTransporte = responsableTransporte; }
     public String getPatenteVehiculo() { return patenteVehiculo; }
     public void setPatenteVehiculo(String patenteVehiculo) { this.patenteVehiculo = patenteVehiculo; }
+    public Long getProductoId() { return productoId; }
+    public void setProductoId(Long productoId) { this.productoId = productoId; }
+    public Integer getCantidadProducto() { return cantidadProducto; }
+    public void setCantidadProducto(Integer cantidadProducto) { this.cantidadProducto = cantidadProducto; }
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }

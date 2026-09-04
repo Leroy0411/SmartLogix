@@ -1,9 +1,11 @@
 package donaton.msinventario.controller;
 
+import donaton.msinventario.dto.ProductoCreateRequest;
 import donaton.msinventario.model.Producto;
 import donaton.msinventario.service.InventarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +16,13 @@ import java.util.Map;
 /**
  * Controlador REST de MS-Inventario.
  * Expone las operaciones del módulo "Gestión de Inventario" de SmartLogix.
+ *
+ * CORS ya no acepta "*": ver {@link donaton.msinventario.config.CorsConfig}.
+ * Las escrituras (POST/PUT/DELETE) exigen header X-API-KEY:
+ * ver {@link donaton.msinventario.security.ApiKeyFilter}.
  */
 @RestController
 @RequestMapping("/api/inventario")
-@CrossOrigin(origins = "*")
 @Tag(name = "Inventario", description = "Gestión de stock de productos por bodega (con Factory Method)")
 public class InventarioController {
 
@@ -55,19 +60,15 @@ public class InventarioController {
 
     @Operation(summary = "Registrar un nuevo producto en inventario (aplica Factory Method según categoría)")
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody Map<String, Object> body) {
-        try {
-            Producto creado = inventarioService.crearProducto(
-                    (String) body.get("categoria"),
-                    (String) body.get("proveedor"),
-                    body.get("stock") != null ? Integer.valueOf(body.get("stock").toString()) : null,
-                    body.get("bodegaId") != null ? Long.valueOf(body.get("bodegaId").toString()) : null,
-                    (String) body.get("descripcion")
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(creado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Producto> crear(@Valid @RequestBody ProductoCreateRequest request) {
+        Producto creado = inventarioService.crearProducto(
+                request.getCategoria(),
+                request.getProveedor(),
+                request.getStock(),
+                request.getBodegaId(),
+                request.getDescripcion()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
     @Operation(summary = "Actualizar el estado de un producto")

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/bff")
-@CrossOrigin(origins = "*")
 @Tag(name = "BFF", description = "Backend For Frontend: agrega datos de MS-Inventario y MS-Pedidos")
 public class BffController {
 

@@ -15,6 +15,13 @@ import {
 
 vi.mock('axios');
 
+// Las escrituras (POST/PUT/DELETE) ahora exigen el header X-API-KEY
+// (ver ApiKeyFilter en ms-inventario/ms-pedidos), así que las llamadas
+// del Facade deben incluirlo siempre.
+const conApiKey = () => expect.objectContaining({
+    headers: expect.objectContaining({ 'X-API-KEY': expect.any(String) }),
+});
+
 describe('donatonApi (Facade de llamadas HTTP)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -38,30 +45,34 @@ describe('donatonApi (Facade de llamadas HTTP)', () => {
         expect(resultado).toHaveLength(1);
     });
 
-    it('crearProducto realiza un POST con los datos enviados', async () => {
+    it('crearProducto realiza un POST con los datos enviados y el header X-API-KEY', async () => {
         const nuevo = { categoria: 'ALIMENTOS', proveedor: 'Maipú', stock: 10, bodegaId: 1 };
         axios.post.mockResolvedValue({ data: { id: 5, ...nuevo } });
 
         const resultado = await crearProducto(nuevo);
 
-        expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('/api/inventario'), nuevo);
+        expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('/api/inventario'), nuevo, conApiKey());
         expect(resultado.id).toBe(5);
     });
 
-    it('actualizarEstadoProducto realiza un PUT con el estado como query param', async () => {
+    it('actualizarEstadoProducto realiza un PUT con el estado como query param y el header X-API-KEY', async () => {
         axios.put.mockResolvedValue({ data: { id: 1, estado: 'RESERVADO' } });
 
         await actualizarEstadoProducto(1, 'RESERVADO');
 
-        expect(axios.put).toHaveBeenCalledWith(expect.stringContaining('/api/inventario/1/estado?estado=RESERVADO'));
+        expect(axios.put).toHaveBeenCalledWith(
+            expect.stringContaining('/api/inventario/1/estado?estado=RESERVADO'),
+            null,
+            conApiKey()
+        );
     });
 
-    it('eliminarProducto realiza un DELETE al endpoint correcto', async () => {
+    it('eliminarProducto realiza un DELETE al endpoint correcto con el header X-API-KEY', async () => {
         axios.delete.mockResolvedValue({ data: { mensaje: 'ok' } });
 
         await eliminarProducto(7);
 
-        expect(axios.delete).toHaveBeenCalledWith(expect.stringContaining('/api/inventario/7'));
+        expect(axios.delete).toHaveBeenCalledWith(expect.stringContaining('/api/inventario/7'), conApiKey());
     });
 
     it('getCentros llama al endpoint de centros de distribución de MS-Pedidos', async () => {
@@ -72,13 +83,17 @@ describe('donatonApi (Facade de llamadas HTTP)', () => {
         expect(axios.get).toHaveBeenCalledWith(expect.stringContaining('/api/pedidos/centros-distribucion'));
     });
 
-    it('crearCentro realiza un POST con los datos del centro', async () => {
+    it('crearCentro realiza un POST con los datos del centro y el header X-API-KEY', async () => {
         const centro = { nombre: 'Centro X', capacidadMaxima: 50 };
         axios.post.mockResolvedValue({ data: { id: 1, ...centro } });
 
         await crearCentro(centro);
 
-        expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('/api/pedidos/centros-distribucion'), centro);
+        expect(axios.post).toHaveBeenCalledWith(
+            expect.stringContaining('/api/pedidos/centros-distribucion'),
+            centro,
+            conApiKey()
+        );
     });
 
     it('getPedidos llama al endpoint de pedidos de MS-Pedidos', async () => {
@@ -89,19 +104,27 @@ describe('donatonApi (Facade de llamadas HTTP)', () => {
         expect(axios.get).toHaveBeenCalledWith(expect.stringContaining('/api/pedidos'));
     });
 
-    it('despacharPedido realiza un PUT al endpoint de despacho', async () => {
+    it('despacharPedido realiza un PUT al endpoint de despacho con el header X-API-KEY', async () => {
         axios.put.mockResolvedValue({ data: { estado: 'EN_CAMINO' } });
 
         await despacharPedido(2);
 
-        expect(axios.put).toHaveBeenCalledWith(expect.stringContaining('/api/pedidos/2/despachar'));
+        expect(axios.put).toHaveBeenCalledWith(
+            expect.stringContaining('/api/pedidos/2/despachar'),
+            null,
+            conApiKey()
+        );
     });
 
-    it('confirmarEntrega realiza un PUT con observaciones como query param', async () => {
+    it('confirmarEntrega realiza un PUT con observaciones codificadas como query param y el header X-API-KEY', async () => {
         axios.put.mockResolvedValue({ data: { estado: 'ENTREGADO' } });
 
         await confirmarEntrega(2, 'Todo OK');
 
-        expect(axios.put).toHaveBeenCalledWith(expect.stringContaining('observaciones=Todo OK'));
+        expect(axios.put).toHaveBeenCalledWith(
+            expect.stringContaining(`observaciones=${encodeURIComponent('Todo OK')}`),
+            null,
+            conApiKey()
+        );
     });
 });

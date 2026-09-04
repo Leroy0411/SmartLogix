@@ -5,6 +5,7 @@ import donaton.mspedidos.model.Pedido;
 import donaton.mspedidos.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +17,13 @@ import java.util.Map;
  * Controlador REST de MS-Pedidos.
  * Expone las operaciones de los módulos "Procesamiento de Pedidos" y
  * "Coordinación de Envíos" de SmartLogix.
+ *
+ * CORS ya no acepta "*": ver {@link donaton.mspedidos.config.CorsConfig}.
+ * Las escrituras (POST/PUT/DELETE) exigen header X-API-KEY:
+ * ver {@link donaton.mspedidos.security.ApiKeyFilter}.
  */
 @RestController
 @RequestMapping("/api/pedidos")
-@CrossOrigin(origins = "*")
 @Tag(name = "Pedidos", description = "Procesamiento de pedidos y coordinación de envíos (con patrón Observer)")
 public class PedidoController {
 
@@ -51,7 +55,7 @@ public class PedidoController {
 
     @Operation(summary = "Registrar un nuevo centro de distribución")
     @PostMapping("/centros-distribucion")
-    public ResponseEntity<CentroDistribucion> crearCentro(@RequestBody CentroDistribucion centro) {
+    public ResponseEntity<CentroDistribucion> crearCentro(@Valid @RequestBody CentroDistribucion centro) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.agregarCentro(centro));
     }
 
@@ -89,7 +93,7 @@ public class PedidoController {
 
     @Operation(summary = "Crear un nuevo pedido (notifica a los observadores registrados)")
     @PostMapping
-    public ResponseEntity<Pedido> crearPedido(@RequestBody Pedido pedido) {
+    public ResponseEntity<Pedido> crearPedido(@Valid @RequestBody Pedido pedido) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.crearPedido(pedido));
     }
 

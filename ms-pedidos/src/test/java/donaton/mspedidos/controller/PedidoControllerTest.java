@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,8 +25,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Pruebas unitarias del PedidoController mediante @WebMvcTest.
  * Verifica el contrato HTTP de los endpoints de centros de distribución y pedidos.
+ *
+ * addFilters = false: ver la misma nota en InventarioControllerTest — el
+ * ApiKeyFilter tiene su propia prueba dedicada.
  */
 @WebMvcTest(PedidoController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("PedidoController - Pruebas Unitarias")
 class PedidoControllerTest {
 
@@ -143,6 +148,30 @@ class PedidoControllerTest {
 
         mockMvc.perform(put("/api/pedidos/999/despachar"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PUT /api/pedidos/{id}/despachar sobre un pedido en estado inválido retorna 409")
+    void despachar_estadoInvalido_retornaConflict() throws Exception {
+        when(pedidoService.despacharPedido(1L))
+                .thenThrow(new IllegalStateException("No se puede despachar el pedido #1: está en estado ENTREGADO (se requiere PENDIENTE)"));
+
+        mockMvc.perform(put("/api/pedidos/1/despachar"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/pedidos con centro de distribución inexistente retorna 400")
+    void crearPedido_centroInexistente_retornaBadRequest() throws Exception {
+        when(pedidoService.crearPedido(any()))
+                .thenThrow(new IllegalArgumentException("Centro de distribución no encontrado: 99"));
+
+        mockMvc.perform(post("/api/pedidos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(pedidoEjemplo)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
     }
 
     @Test
