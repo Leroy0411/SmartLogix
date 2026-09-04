@@ -328,6 +328,5 @@ apartado B/C del informe (decisiones de desarrollo y mejoras identificadas):
 
 - 📄 `documentacion/analisis-patrones-y-arquetipos.pdf`
 - 📄 `documentacion/plan-branching.pdf`
-- 📄 `documentacion/repositorios.txt` — actualizar `TU_USUARIO_GITHUB` con tu usuario real antes de entregar
-- 📊 `documentacion/cobertura/frontend-coverage/index.html` — reporte de cobertura del frontend (Vitest), generado sobre la versión previa del dominio; se recomienda regenerarlo con `npm run test:coverage` tras este refactor
+- 📄 `documentacion/repositorios.txt` 
 

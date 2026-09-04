@@ -10,7 +10,7 @@ se entrega como UN SOLO monorepo con todos los componentes.
 
 REPOSITORIO
 ─────────────────────
-URL: https://github.com/TU_USUARIO_GITHUB/smartlogix
+URL: https://github.com/leroy0411/smartlogix
 Descripción: Monorepo con los 3 microservicios/BFF backend, el frontend
              React y la documentación del Parcial 3.
 
